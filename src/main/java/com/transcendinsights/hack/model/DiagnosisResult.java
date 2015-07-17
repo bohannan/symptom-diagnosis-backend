@@ -21,12 +21,14 @@ public class DiagnosisResult implements Comparable<DiagnosisResult> {
     String url;
     List<String> symptomsMatched;
     Double frequency;
+    List<String> suggestedLabs;
 
-    public DiagnosisResult(String diagName, String url, List<String> symptomsMatched, Double frequency) {
+    public DiagnosisResult(String diagName, String url, List<String> symptomsMatched, Double frequency,List<String> suggestedLabs) {
         this.diagName = diagName;
         this.url = url;
         this.symptomsMatched = symptomsMatched;
         this.frequency = frequency;
+        this.suggestedLabs = suggestedLabs;
     }
 
     public String getDiagName() {
@@ -59,6 +61,14 @@ public class DiagnosisResult implements Comparable<DiagnosisResult> {
 
     public void setFrequency(Double frequency) {
         this.frequency = frequency;
+    }
+
+    public List<String> getSuggestedLabs() {
+        return suggestedLabs;
+    }
+
+    public void setSuggestedLabs(List<String> suggestedLabs) {
+        this.suggestedLabs = suggestedLabs;
     }
 
     @Override

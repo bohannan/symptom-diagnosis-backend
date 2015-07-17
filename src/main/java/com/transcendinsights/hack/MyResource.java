@@ -53,11 +53,12 @@ public class MyResource {
         DBCollection collection = getCollectionFromDB("disease");
         if(collection!=null) {
             BasicDBObject inQuery = new BasicDBObject();
-            inQuery.put("symptomNames", new BasicDBObject("$in", symptomRequest.getSymptoms()));
+            inQuery.put("symptoms", new BasicDBObject("$in", symptomRequest.getSymptoms()));
             DBCursor cursor = collection.find(inQuery);
             System.out.println("In Query!!!!!"+inQuery.toString());
             List<Disease> diagnosisList = new ArrayList<>();
             List<String> diseaseList = new ArrayList<>();
+            Map<String, List<String>> suggestedLabsMap = new HashMap<>();
             Map<String, List<String>> matchingSymptomsMap = new HashMap<>();
             while (cursor.hasNext()) {
                 DBObject object = cursor.next();
@@ -69,7 +70,7 @@ public class MyResource {
                 Set<String> symptomSet = new HashSet<>();
                 symptomSet.addAll(symptomRequest.getSymptoms());
                 List<String> matchingSmptomList = new ArrayList<>();
-                for(Object o : d.getSymptomNames()){
+                for(Object o : d.getSymptoms()){
                     String s = String.valueOf(o);
                     if(symptomSet.contains(s)){
                         matchingSmptomList.add(s);
@@ -114,7 +115,9 @@ public class MyResource {
                 diags.add(new DiagnosisResult(d.getName(),
                         diseaseUrlMap.get(d.disease),
                         matchingSymptomsMap.get(d.disease),
-                        diseaseFreqMap.get(d.disease)));
+                        diseaseFreqMap.get(d.disease),
+                        suggestedLabsMap.get(d.disease)
+                ));
             }
         }
         Gson pretty = new GsonBuilder().setPrettyPrinting().create();

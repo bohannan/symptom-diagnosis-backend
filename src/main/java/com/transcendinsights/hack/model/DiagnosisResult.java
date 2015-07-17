@@ -5,7 +5,7 @@ import java.util.List;
 /**
  * Created by ljb9764 on 7/16/15.
  */
-public class DiagnosisResult {
+public class DiagnosisResult implements Comparable<DiagnosisResult> {
     /*
     {
   "diagName": "something",
@@ -27,5 +27,55 @@ public class DiagnosisResult {
         this.url = url;
         this.symptomsMatched = symptomsMatched;
         this.frequency = frequency;
+    }
+
+    public String getDiagName() {
+        return diagName;
+    }
+
+    public void setDiagName(String diagName) {
+        this.diagName = diagName;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public List<String> getSymptomsMatched() {
+        return symptomsMatched;
+    }
+
+    public void setSymptomsMatched(List<String> symptomsMatched) {
+        this.symptomsMatched = symptomsMatched;
+    }
+
+    public Double getFrequency() {
+        return frequency;
+    }
+
+    public void setFrequency(Double frequency) {
+        this.frequency = frequency;
+    }
+
+    @Override
+    public int compareTo(DiagnosisResult o) {
+        if (this.getSymptomsMatched() != null && o.getSymptomsMatched()!=null){
+            if(this.getSymptomsMatched().size() == o.getSymptomsMatched().size()){
+                if (this.getFrequency() != null && o.getFrequency() != null) {
+                    if (this.frequency.equals(o.frequency)) {
+                        return 0;
+                    }
+                    return this.frequency < o.frequency ? 1 : -1;
+                }
+                //one is null the one with a frequency wins!
+                return this.frequency ==null ? (o.frequency==null)? 0 : 1 : -1 ;
+            }
+            return this.symptomsMatched.size() < o.symptomsMatched.size() ? 1 : -1;
+        }
+        return this.symptomsMatched == null ? (o.symptomsMatched==null)? 0 : -1 : 1  ;
     }
 }

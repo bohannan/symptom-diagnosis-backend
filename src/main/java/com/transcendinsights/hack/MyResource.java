@@ -1,6 +1,7 @@
 package com.transcendinsights.hack;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.mongodb.*;
 import com.transcendinsights.hack.model.DiagnosisResult;
 import com.transcendinsights.hack.model.Disease;
@@ -116,8 +117,12 @@ public class MyResource {
                         diseaseFreqMap.get(d.disease)));
             }
         }
+        Gson pretty = new GsonBuilder().setPrettyPrinting().create();
+        System.out.println(pretty.toJson(diags));
 
-        return new Gson().toJson(diags);
+        Collections.sort(diags);
+
+        return pretty.toJson(diags);
     }
 
     private DBCollection getCollectionFromDB(String collectionName){

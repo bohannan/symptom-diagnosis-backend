@@ -7,7 +7,8 @@ class DiseaseElement {
 }
 
 class SymptomElement {
-  String symptom, name, labs, labNames
+    String symptom, name
+    def labs, labNames
 }
 
 class DistributionElement {
@@ -33,7 +34,7 @@ class Element {
     String name
     String URL
 }
-File file = new File("disease-sign-symptoms.txt")
+File file = new File("sign-symptom-labs.txt")
 Boolean header = true
 if (!file.exists()) {
      println "File does not exist"
@@ -47,7 +48,7 @@ if (!file.exists()) {
           headers.addAll(columns)
           header = false;
       } else {
-          def element = new DiseaseElement()
+          def element = new SymptomElement()
           for (int i =0 ; i<columns.size();++i){
               if(i==2){
                   element[headers.get(i)]=Arrays.asList(columns.get(i).replaceAll("[^A-Za-z0-9_ ]","").split(" "))
@@ -55,11 +56,11 @@ if (!file.exists()) {
                   element[headers.get(i)]=columns.get(i)
               }
           }
-          List<String> symptomNames = new ArrayList<>()
-          element.symptoms.each { symptom ->
-              symptomNames.add(symptom.toLowerCase().replaceAll("_"," "))
+          List<String> labNames = new ArrayList<>()
+          element.labs.each { symptom ->
+              labNames.add(symptom.toLowerCase().replaceAll("_"," "))
           }
-          element.symptomNames=symptomNames
+          element.labNames=labNames
           println new JsonBuilder(element).toPrettyString()
       }
   }

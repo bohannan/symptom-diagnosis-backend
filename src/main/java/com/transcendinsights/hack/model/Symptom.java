@@ -10,9 +10,9 @@ import java.util.List;
  * Created by ljb9764 on 7/16/15.
  */
 public class Symptom {
-    String symptom, name;
-    Object labs;
-    Object labNames;
+    public String symptom, name;
+    public Object labs;
+    public Object labNames;
 
     public Symptom(DBObject object) {
         this.symptom = (String) object.get("symptom");

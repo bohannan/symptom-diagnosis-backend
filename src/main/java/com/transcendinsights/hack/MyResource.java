@@ -58,7 +58,6 @@ public class MyResource {
             System.out.println("In Query!!!!!"+inQuery.toString());
             List<Disease> diagnosisList = new ArrayList<>();
             List<String> diseaseList = new ArrayList<>();
-            Map<String, List<String>> suggestedLabsMap = new HashMap<>();
             Map<String, List<String>> matchingSymptomsMap = new HashMap<>();
             while (cursor.hasNext()) {
                 DBObject object = cursor.next();
@@ -109,6 +108,32 @@ public class MyResource {
             }
             System.out.println("Past Last query");
 
+            //get suggested Labs
+            DBCollection dbCollection = getCollectionFromDB("symptoms");
+            BasicDBObject inQuery4 = new BasicDBObject();
+            inQuery4.put("symptom", new BasicDBObject("$in", diseaseList));
+
+            System.out.println("In Query!!!!!" + inQuery4.toString());
+            DBCursor labCursor = dbCollection.find(inQuery4);
+            Map<String, List<String>> suggestedLabsMap = new HashMap<>();
+
+            System.out.println("In Last query, before Loop");
+            while (labCursor.hasNext()){
+                DBObject object = labCursor.next();
+
+//                String disease = (String) object.get("symptom");
+                List<String> suggestedLabList = new ArrayList<>();
+                Symptom s = new Symptom(object);
+                if(s.getLabNames()!=null) {
+                    System.out.println("In Last query, before");
+                    for (Object o : s.getLabNames()) {
+                        String str = String.valueOf(o);
+                        suggestedLabList.add(str);
+                    }
+                    System.out.println("In Last query, after");
+                }
+                suggestedLabsMap.put(s.getSymptom(),suggestedLabList);
+            }
 
             //collate all the data
             for(Disease d: diagnosisList){

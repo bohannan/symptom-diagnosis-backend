@@ -10,8 +10,7 @@ import com.transcendinsights.hack.model.SymptomRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Root resource (exposed at "myresource" path)
@@ -44,19 +43,77 @@ public class MyResource {
     }
 
     @POST
-    @Produces(MediaType.TEXT_PLAIN)
-    public String getDiagnosis(SymptomRequest symptomRequest) {
+    @Consumes(MediaType.APPLICATION_JSON)
+    public String getDiagnosis(String message) {
         List<DiagnosisResult> diags = new ArrayList<>();
-        System.out.println("Hit post!!!!!");
+        System.out.println("Hit post!!!!!"+message);
+        Gson gson = new Gson();
+        SymptomRequest symptomRequest = gson.fromJson(message, SymptomRequest.class);
         DBCollection collection = getCollectionFromDB("disease");
         if(collection!=null) {
             BasicDBObject inQuery = new BasicDBObject();
-            inQuery.put("symptomNames", new BasicDBObject("$in", symptomRequest.symptoms));
+            inQuery.put("symptomNames", new BasicDBObject("$in", symptomRequest.getSymptoms()));
             DBCursor cursor = collection.find(inQuery);
+            System.out.println("In Query!!!!!"+inQuery.toString());
+            List<Disease> diagnosisList = new ArrayList<>();
+            List<String> diseaseList = new ArrayList<>();
+            Map<String, List<String>> matchingSymptomsMap = new HashMap<>();
             while (cursor.hasNext()) {
-                Disease disease = new Disease(cursor.next());
+                DBObject object = cursor.next();
+                Disease d = new Disease(object);
+                diagnosisList.add(d);
+                diseaseList.add(d.getDisease());
+//                System.out.println(new Gson().toJson(disease.getSymptoms()));
+                //match symptoms
+                Set<String> symptomSet = new HashSet<>();
+                symptomSet.addAll(symptomRequest.getSymptoms());
+                List<String> matchingSmptomList = new ArrayList<>();
+                for(Object o : d.getSymptomNames()){
+                    String s = String.valueOf(o);
+                    if(symptomSet.contains(s)){
+                        matchingSmptomList.add(s);
+                    }
+                }
+                matchingSymptomsMap.put(d.disease,matchingSmptomList);
+            }
+            System.out.println("Past first query");
 
-                diags.add(new DiagnosisResult(disease.name, null, null, null));
+            //now go get the url
+            DBCollection coll2 = getCollectionFromDB("disease_url");
+            BasicDBObject inQuery2 = new BasicDBObject();
+            inQuery2.put("term", new BasicDBObject("$in", diseaseList));
+            DBCursor urlCursor = coll2.find(inQuery2);
+            Map<String,String> diseaseUrlMap = new HashMap<>();
+            while (urlCursor.hasNext()) {
+                DBObject object = urlCursor.next();
+                diseaseUrlMap.put((String)object.get("term"),(String)object.get("URL"));
+            }
+            System.out.println("Past second query");
+
+
+            //get frequency
+            DBCollection coll3 = getCollectionFromDB("disease_frequency");
+            BasicDBObject inQuery3 = new BasicDBObject();
+            inQuery3.put("eref", new BasicDBObject("$in", diseaseList));
+            inQuery3.put("gender",symptomRequest.getGender());
+            DBCursor freqCursor = coll3.find(inQuery3);
+            Map<String,Double> diseaseFreqMap = new HashMap<>();
+            while (freqCursor.hasNext()) {
+//                System.out.println("In loop");
+                DBObject object = freqCursor.next();
+                String freq = (String) object.get(symptomRequest.getAgeGroup());
+                String disease = (String) object.get("eref");
+                diseaseFreqMap.put(disease,Double.parseDouble(freq));
+            }
+            System.out.println("Past Last query");
+
+
+            //collate all the data
+            for(Disease d: diagnosisList){
+                diags.add(new DiagnosisResult(d.getName(),
+                        diseaseUrlMap.get(d.disease),
+                        matchingSymptomsMap.get(d.disease),
+                        diseaseFreqMap.get(d.disease)));
             }
         }
 

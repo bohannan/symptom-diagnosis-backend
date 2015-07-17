@@ -1,7 +1,9 @@
 import groovy.json.*
 
 class DiseaseElement {
-  def disease, name, symptoms, symptomNames
+    String disease
+    String name
+    def symptoms, symptomNames
 }
 
 class SymptomElement {
@@ -50,7 +52,7 @@ if (!file.exists()) {
               if(i==2){
                   element[headers.get(i)]=Arrays.asList(columns.get(i).replaceAll("[^A-Za-z0-9_ ]","").split(" "))
               } else {
-                  element[headers.get(i)]=Arrays.asList(columns.get(i))
+                  element[headers.get(i)]=columns.get(i)
               }
           }
           List<String> symptomNames = new ArrayList<>()

@@ -7,7 +7,6 @@ import java.util.List;
 /**
  * Created by ljb9764 on 7/16/15.
  */
-@XmlAccessorType(XmlAccessType.FIELD)
 public class SymptomRequest {
 
    /*
@@ -21,9 +20,32 @@ public class SymptomRequest {
         "headache","nausea"]}
     */
 
-    public String ageGroup;
-    public String gender;
+    private String ageGroup;
+    private String gender;
     public List<String> symptoms;
 
 
+    public String getAgeGroup() {
+        return ageGroup;
+    }
+
+    public void setAgeGroup(String ageGroup) {
+        this.ageGroup = ageGroup;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    public List<String> getSymptoms() {
+        return symptoms;
+    }
+
+    public void setSymptoms(List<String> symptoms) {
+        this.symptoms = symptoms;
+    }
 }
